@@ -34,6 +34,7 @@ function getProducts($db){
     return $data;
 }
 
+// ürün detayları fonksiyonu
 function getProductsDetails($db,$product_id){
     $stmt = $db->query("SELECT * FROM products where id={$product_id}");
     while ($row = $stmt->fetch()) {
@@ -49,6 +50,7 @@ function getProductsDetails($db,$product_id){
     return $data;
 }
 
+// Kategori detayları fonksiyonu
 function getCategoryDetails($db,$category_id){
     $stmt = $db->query("SELECT * FROM categories where id={$category_id}");
     while ($row = $stmt->fetch()) {
@@ -61,17 +63,20 @@ function getCategoryDetails($db,$category_id){
     }
     return $data;
 }
+
+// fiyat formatlama fonksiyonu
 function price_format($price)
 {
     $new_price = number_format($price, 2, ',', '.');
     return $new_price;
 }
 
-
+// şifreleme
 function passwordConvertor($password){
     return md5(sha1(md5($password)));
 }
 
+// Kullanıcının aktif sepetini bulma fonksiyonu
 function GetUserActiveBasket($db,$user_token="OL7c31YGKUgDtyv3")
 {
     $sql=$db->query("SELECT * from user_basket where user_token='{$user_token}' and status='0'")->fetch(PDO::FETCH_ASSOC);
@@ -79,6 +84,7 @@ function GetUserActiveBasket($db,$user_token="OL7c31YGKUgDtyv3")
 
 }
 
+// Sepetteki ürünler fonksiyonu
 function GetBasketItems($db,$user_token="OL7c31YGKUgDtyv3")
 {
     $ActiveBasketId=GetUserActiveBasket($db,$user_token);
@@ -102,6 +108,7 @@ function GetBasketItems($db,$user_token="OL7c31YGKUgDtyv3")
     return $data;
 }
 
+// Sepet ürün sayısı(stok kontrolü için)
 function UserBasketProductCount($db,$product_id,$basket_id)
 {
     $sql=$db->query("SELECT count(*) as product_count from basket_products where product_id='{$product_id}' and active_basket_id='{$basket_id}' and status='1'")->fetch(PDO::FETCH_ASSOC);
@@ -109,6 +116,7 @@ function UserBasketProductCount($db,$product_id,$basket_id)
     return $sql["product_count"];
 }
 
+// İndirim için kategoriye ait ürün sayısı
 function UserBasketCategoryCount($db,$category_id,$basket_id)
 {
     $sql=$db->query("SELECT count(*) as category_count from basket_products where category_id='{$category_id}' and active_basket_id='{$basket_id}' and status='1'")->fetch(PDO::FETCH_ASSOC);
@@ -116,6 +124,7 @@ function UserBasketCategoryCount($db,$category_id,$basket_id)
     return $sql["category_count"];
 }
 
+// Sepet ürün fiyatı
 function UserBasketProductPrice($db,$product_id,$basket_id)
 {
     $sql=$db->query("SELECT sum(price) as product_price from basket_products where product_id='{$product_id}' and active_basket_id='{$basket_id}' and status='1'")->fetch(PDO::FETCH_ASSOC);
@@ -123,6 +132,7 @@ function UserBasketProductPrice($db,$product_id,$basket_id)
     return $sql["product_price"];
 }
 
+// Kullanıcı toplam sepet tutarı
 function UserBasketTotalPrice($db,$user_token="OL7c31YGKUgDtyv3")
 {
     $ActiveBasket_Id=GetUserActiveBasket($db,$user_token);
@@ -132,6 +142,7 @@ function UserBasketTotalPrice($db,$user_token="OL7c31YGKUgDtyv3")
     return discount($db,$user_token);
 }
 
+// Sepette indirimleri uygulama
 function AddBasketDiscount($db,$user_token="OL7c31YGKUgDtyv3",$price)
 {
     $ActiveBasket_Id=GetUserActiveBasket($db,$user_token);
@@ -141,6 +152,7 @@ function AddBasketDiscount($db,$user_token="OL7c31YGKUgDtyv3",$price)
     $update = $db->query("UPDATE user_basket SET discount_total='{$new_price}' WHERE id = '{$ActiveBasket_Id}' ");    
 }   
 
+// Sepet toplam indirim tutarı
 function BasketDiscount($db,$user_token="OL7c31YGKUgDtyv3")
 {
     $ActiveBasket_Id=GetUserActiveBasket($db,$user_token);
@@ -150,6 +162,7 @@ function BasketDiscount($db,$user_token="OL7c31YGKUgDtyv3")
     return $discount_total;
 }
 
+// İndirim hesaplama
 function discount($db,$user_token="OL7c31YGKUgDtyv3")
 {
     $yuzde_kac_indirim=10;
@@ -223,7 +236,7 @@ function discount($db,$user_token="OL7c31YGKUgDtyv3")
 
 
 
-
+// Login
 if(isset($_POST["login_action"])){
     $email = $_POST["email"];
     $password = passwordConvertor($_POST["password"]);
